@@ -12,6 +12,25 @@ function boop(params){
 	}
 }
 
+
+function next(){
+	last.push(twitter.tweets.search_metadata.max_id_str);
+	boop(twitter.tweets.search_metadata.next_results);
+}
+
+function prev(){
+	if(last.length > 0){
+		boop("?max_id="+last.pop()+"&q=%23pico8-filter:retweets&count=1&include_entitites=0");
+	}else{
+		refresh();
+	}
+}
+
+function refresh(){
+	last=[];
+	boop("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
+}
+
 comms.onstartup = function(){
 	boop("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
 };
@@ -26,15 +45,10 @@ comms.onreceive = function(){
 		btns[i]=b[i];
 	}
 	if(btnsp[0]){
-		// newer?
-		boop("?max_id="+last.pop()+"&q=%23pico8-filter:retweets&count=1&include_entitites=0");
+		prev();
 	}else if(btnsp[1]){
-		// older
-		last.push(twitter.tweets.search_metadata.max_id_str);
-		boop(twitter.tweets.search_metadata.next_results);
+		next();
 	}else if(btnsp[2]){
-		// refresh
-		last=[];
-		boop("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
+		refresh();
 	}
 };
