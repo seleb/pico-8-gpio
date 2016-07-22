@@ -44,7 +44,7 @@ function _init()
  
  data_bytes=120
  
- frame_data="real username (@notreallythough):\n\nend of my #pico8 triangulating madness. it's 99.99% solid, just one occasional off pixel that i can totally tolerate"
+ frame_data="waiting for data..."
  temp_frame_data=frame_data
  
  state=states.starting
@@ -79,8 +79,15 @@ function _init()
  palette={1,7,12}
  palette_o=0
  
+ tweet={}
+ tweet.s=""
+ tweet.y=0
+ 
+ last_btn=my_data[1]
+ 
  process_data()
 end
+
 
 function _update()
  --only go if it's our turn
@@ -148,22 +155,33 @@ function process_data()
    x+=1
   end
  end
- tweet={}
+ tweet.os = tweet.s
+ tweet.oy = tweet.y
  tweet.s=a..b
  tweet.y=y
+ tweet.f=time()
 end
 
 function write_data()
  --write our data into the packet
  --(assumes that we don't need multiple packets for our data)
  update_my_data()
- for i=1,data_bytes do
+ for i=1,my_data_length do
   wpin(i+pins.data_start-1,my_data[i])
  end
+ wpin(pins.data_length,my_data_length)
 end
 
 function update_my_data()
- my_data[0]=btn()
+ b = btn()
+ if b != last_btn then
+  my_data[1]=b
+  my_data_length=1
+  last_btn=b
+ else
+  my_data_length=0
+ end
+  
 end
 
 function _draw()
@@ -182,6 +200,37 @@ function _draw()
  end
  
  --extras
+ if time() - tweet.f < 0.5 then
+  print_ol(tweet.os,5,54-tweet.oy/2,1,7)
+  
+  --fadeout
+  color(12)
+  for x=0,127,6 do
+  for y=0,100,6 do
+  r=2-y/8+(time()-tweet.f)*32
+   if r > 0 then
+    rectfill(x-r/2,y-r/2,x+r,y+r)
+   end
+  end
+  end
+ else
+  print_ol(tweet.s,5,54-tweet.y/2,1,7)
+ 
+  --fadein
+  if time() - tweet.f < 1.0 then
+   color(12)
+   for x=0,127,6 do
+   for y=0,100,6 do
+    r=18+y/8+(tweet.f-time())*32
+    if r > 0 then
+     rectfill(x-r/2,y-r/2,x+r,y+r)
+    end
+   end
+   end
+  end
+ end
+ 
+ 
  color(7)
  line(5,100,122,100)
  
@@ -195,9 +244,6 @@ function _draw()
  end
  
  sspr(0,8,16,16,117-8,10-8)
-
- print_ol(tweet.s,5,54-tweet.y/2,1,7)
- 
 end
 
 function draw_debug()
