@@ -1,5 +1,5 @@
 var twitter={
-	tweets:{},
+	tweets:null,
 
 	getTweet: function(params){
 		var request = new XMLHttpRequest();
@@ -8,15 +8,11 @@ var twitter={
 			if(request.status == 200){
 				// success
 					this.tweets = JSON.parse(request.responseText);
-					console.log(this.tweets);
+					console.log("Loaded tweet:",JSON.stringify(this.tweets));
 
 					var t = this.tweets.statuses[0];
 
-					comms.send(
-						t.user.name+" (@"+t.user.name+"):\n\n"
-						+t.text+"\n\n"
-						+new Date(t.created_at).toLocaleDateString()
-					);
+					this.ontweetloaded();
 				}else if(request.status == 400){
 					// error
 					console.error(request.responseText);
@@ -28,5 +24,9 @@ var twitter={
 
 		request.open("get", "http://seans.site/stuff/P8T/gpiotest-twitter.php"+params, true);
 		request.send();
+	},
+
+	ontweetloaded: function(){
+		// can overwrite this
 	}
 };

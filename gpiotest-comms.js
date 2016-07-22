@@ -63,8 +63,7 @@ var comms = {
 				data = data.substr(chars.length);
 			}
 
-			console.log("Sending packets:");
-			console.log(JSON.stringify(this.pending_packets));
+			console.log("Sending packets:",JSON.stringify(this.pending_packets));
 			this.state = this.States.SENDING;
 		}else{
 			console.error("Comms busy; send aborted");
@@ -120,6 +119,7 @@ var comms = {
 		switch(this.state){
 			case this.States.STARTING: 
 				// if cart is in startup state, switch to idle
+				console.log("Comms established");
 				this.state = this.States.IDLE;
 				this.onstartup();
 				break;
