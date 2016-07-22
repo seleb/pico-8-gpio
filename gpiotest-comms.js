@@ -30,43 +30,45 @@ var comms = {
 	data_bytes: 120, // bytes available for data
 
 	pending_packets: [],
-	incoming_packet: {
-		data:[]
-	},
+	incoming_packet: [],
 
 	send: function (data){
-		// how many packets do we need to send to fit the data?
-		var num_packets = Math.max(1,Math.ceil(data.length/this.data_bytes));
+		if(this.state == this.States.IDLE || this.state == this.States.HOLD){
+			// how many packets do we need to send to fit the data?
+			var num_packets = Math.max(1,Math.ceil(data.length/this.data_bytes));
 
-		// split the data into packets
-		this.pending_packets = [];
-		for(i = 1; i <= num_packets; ++i){
-			// grab the first chunk of the data as a character array
-			var chars = data.substr(0,this.data_bytes).split("");
+			// split the data into packets
+			this.pending_packets = [];
+			for(i = 1; i <= num_packets; ++i){
+				// grab the first chunk of the data as a character array
+				var chars = data.substr(0,this.data_bytes).split("");
 
-			// convert characters to numbers matching
-			for(j=0;j<chars.length;++j){
-				chars[j] = this.charToPico(chars[j]);
+				// convert characters to numbers matching
+				for(j=0;j<chars.length;++j){
+					chars[j] = this.charToPico(chars[j]);
+				}
+
+				// construct the actual packet
+				var packet = {
+					frame_id: i,
+					frame_length: num_packets,
+					data_length: chars.length,
+					data: chars
+				};
+
+				// add the packet to the queue
+				this.pending_packets.push(packet);
+
+				// throw away the data we just packed
+				data = data.substr(chars.length);
 			}
 
-			// construct the actual packet
-			var packet = {
-				frame_id: i,
-				frame_length: num_packets,
-				data_length: chars.length,
-				data: chars
-			};
-
-			// add the packet to the queue
-			this.pending_packets.push(packet);
-
-			// throw away the data we just packed
-			data = data.substr(chars.length);
+			console.log("Sending packets:");
+			console.log(JSON.stringify(this.pending_packets));
+			this.state = this.States.SENDING;
+		}else{
+			console.error("Comms busy; send aborted");
 		}
-
-		console.log("Sending packets:");
-		console.log(JSON.stringify(this.pending_packets));
-		this.state = this.States.SENDING;
 	},
 
 	// converts characters to a format which the cart can read
@@ -95,8 +97,7 @@ var comms = {
 	},
 
 	read_packet:function(){
-		this.incoming_packet = [];
-		for(i=0;i<this.data_bytes;++i){
+		for(i=0;i<pico8_gpio[this.Pins.DATA_LENGTH];++i){
 			this.incoming_packet[i] = pico8_gpio[i+this.Pins.DATA_START];
 		}
 	},

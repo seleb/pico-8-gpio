@@ -1,5 +1,7 @@
 
 var last=[];
+var btns=[];
+var btnsp=[];
 
 function boop(params){
 	if(comms.state == comms.States.IDLE){
@@ -16,21 +18,23 @@ comms.onstartup = function(){
 
 comms.onreceive = function(){
 	var btn = comms.incoming_packet[0];
-	var btns = [];
+	var b = [];
 
 	for(i=0;i<6;++i){
-		btns[i] = (btn & (1 << i)) != 0;
+		b[i] = (btn & (1 << i)) != 0;
+		btnsp[i] = !btns[i] && b[i];
+		btns[i]=b[i];
 	}
-	if(btns[0]){
+	if(btnsp[0]){
 		// newer?
-		last=[];
 		boop("?max_id="+last.pop()+"&q=%23pico8-filter:retweets&count=1&include_entitites=0");
-	}else if(btns[1]){
+	}else if(btnsp[1]){
 		// older
 		last.push(twitter.tweets.search_metadata.max_id_str);
 		boop(twitter.tweets.search_metadata.next_results);
-	}else if(btns[2]){
+	}else if(btnsp[2]){
 		// refresh
+		last=[];
 		boop("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
 	}
 };
