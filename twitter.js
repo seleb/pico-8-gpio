@@ -22,7 +22,7 @@ var twitter={
 			}
 		}.bind(this);
 
-		request.open("get", "http://seans.site/stuff/P8T/gpiotest-twitter.php"+params, true);
+		request.open("get", "http://seans.site/stuff/P8T/twitter.php"+params, true);
 		request.send();
 	},
 

@@ -18,7 +18,7 @@
 		center{
 			text-align:center;
 			width:512px;
-			height:537px;
+			height:557px;
 			position:absolute;
 			display:block;
 			top:0;
@@ -84,6 +84,7 @@
 		<center>
 			<div style="width:512px;">
 				<!-- CANVAS -->
+				<input id="searchField" style="width:100%;height:20px;" value="#pico8-filter:retweets"/>
 				<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 
 				<!-- SCRIPTS -->
@@ -125,7 +126,6 @@
 
 				<!-- WEB STUFF -->
 				<script type="text/javascript" src="p8-gpio-comms.js"></script>
-				<textarea id="searchField" style="width:100%;">q=%23pico8-filter:retweets&count=1&include_entitites=0</textarea>
 				<script type="text/javascript" src="twitter.js"></script>
 				<script type="text/javascript" src="main.js"></script>
 

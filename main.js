@@ -2,6 +2,7 @@
 var last=[];
 var btns=[];
 var btnsp=[];
+var searchField = document.getElementById("searchField");
 
 function search(params){
 	if(comms.state == comms.States.IDLE){
@@ -22,7 +23,7 @@ function next(){
 
 function prev(){
 	if(last.length > 0){
-		search("?max_id="+last.pop()+"&q=%23pico8-filter:retweets&count=1&include_entitites=0");
+		search("?max_id="+last.pop()+"&q="+encodeURIComponent(searchField.value)+"&count=1");
 	}else{
 		refresh();
 	}
@@ -30,7 +31,7 @@ function prev(){
 
 function refresh(){
 	last=[];
-	search("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
+	search("?q="+encodeURIComponent(searchField.value)+"&count=1");
 }
 
 comms.onstartup = function(){
@@ -52,13 +53,17 @@ comms.onstartup = function(){
 		}
 	};
 	twitter.ontweetloaded = function(){
-		var t = twitter.tweets.statuses[0];
-		comms.send(
-			t.user.name+" (@"+t.user.name+"):\n\n"
-			+t.text+"\n\n"
-			+new Date(t.created_at).toLocaleDateString()
-		);
-	}
+		try{
+			var t = twitter.tweets.statuses[0];
+			comms.send(
+				t.user.name+" (@"+t.user.name+"):\n\n"
+				+t.text+"\n\n"
+				+new Date(t.created_at).toLocaleDateString()
+			);
+		}catch(e){
+			comms.send(":(  Sorry!  :(\nThere was an error retrieving tweets.\n\nTry refreshing the page if this continues.");
+		}
+	};
 
-	search("?q=%23pico8-filter:retweets&count=1&include_entitites=0");
+	search("?q="+encodeURIComponent(searchField.value)+"&count=1");
 };
