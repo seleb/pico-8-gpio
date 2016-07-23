@@ -56,7 +56,7 @@ comms.onstartup = function(){
 		try{
 			var t = twitter.tweets.statuses[0];
 			comms.send(
-				t.user.name+" (@"+t.user.name+"):\n\n"
+				t.user.name+" (@"+t.user.screen_name+"):\n\n"
 				+t.text+"\n\n"
 				+new Date(t.created_at).toLocaleDateString()
 			);

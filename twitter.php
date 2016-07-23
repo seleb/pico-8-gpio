@@ -1,5 +1,5 @@
 <?php
-
+header("Access-Control-Allow-Origin: *");
 
 // convert key/secret to credentials
 $credentials = base64_encode(rawurlencode($key).":".rawurlencode($secret));
