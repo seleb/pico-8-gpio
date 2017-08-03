@@ -22,8 +22,7 @@ $bearerToken = $decodedAuth["access_token"];
 $context = stream_context_create(array(
     "http" => array(
         "method"  => "GET",
-        "header"  => "Authorization: Bearer " . $bearerToken . "\r\n",
-        "content" => "grant_type=client_credentials"
+        "header"  => "Authorization: Bearer " . $bearerToken . "\r\n"
     )
 ));
 
